@@ -47,7 +47,7 @@ runs:
 
   steps:
     - name: 'Checkout'
-      if: ${{ inputs.skip_checkout }} != 'true'
+      if: ${{ inputs.skip_checkout_step }} != 'true'
       uses: actions/checkout@v4
 
     - name: 'Install Dependencies'
