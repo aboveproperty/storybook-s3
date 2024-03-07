@@ -47,11 +47,11 @@ runs:
 
   steps:
     - name: 'Checkout'
-      if: ${{ inputs.skip_checkout_step }} != 'true'
+      if: ${{ inputs.skip_checkout_step != 'true' }}
       uses: actions/checkout@v4
 
     - name: 'Install Dependencies'
-      if: ${{ inputs.install_command }} != ''
+      if: ${{ inputs.install_command != '' }}
       shell: bash
       run: ${{ inputs.install_command }}
 
