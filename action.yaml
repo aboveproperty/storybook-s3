@@ -25,6 +25,10 @@ inputs:
     description: 'Preview'
     required: false
     default: 'false'
+  skip_checkout_step:
+    description: 'Skip the checkout step'
+    required: false
+    default: false
   install_command:
     description: 'Command to install dependencies'
     required: false
@@ -33,26 +37,34 @@ inputs:
     description: 'Comand to build storybook'
     required: false
     default: 'npm run build-storybook'
+  destination_directory:
+    description: 'The destination directory'
+    required: false
+    default: 'main'
 
 runs:
   using: 'composite'
 
   steps:
-    - name: Checkout
+    - name: 'Checkout'
+      if: ${{ inputs.skip_checkout }} != 'true'
       uses: actions/checkout@v4
+
+    - name: 'Install Dependencies'
+      if: ${{ inputs.install_command }} != ''
+      shell: bash
+      run: ${{ inputs.install_command }}
 
     - name: 'Build'
       shell: bash
-      run: |
-        ${{ inputs.install_command }}
-        ${{ inputs.build_command }}
+      run: ${{ inputs.build_command }}
     
     - uses: haya14busa/action-cond@v1
       id: preview
       with: 
         cond: ${{ inputs.preview == 'true' }}
-        if_true: "pr-${{ github.event.pull_request.number }}"
-        if_false: "main"
+        if_true: "${{ inputs.destination_directory }}/pr-${{ github.event.pull_request.number }}"
+        if_false: "${{ inputs.destination_directory }}"
 
     - name: 'Deploy to S3'
       uses: jakejarvis/s3-sync-action@master
